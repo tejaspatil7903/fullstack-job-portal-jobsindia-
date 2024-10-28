@@ -1,6 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// Import the environment variable
+const API_BASE_URL = import.meta.env.VITE_BACKEND;
+
 const applicationSlice = createSlice({
   name: "applications",
   initialState: {
@@ -10,7 +13,7 @@ const applicationSlice = createSlice({
     message: null,
   },
   reducers: {
-    requestForAllApplications(state, action) {
+    requestForAllApplications(state) {
       state.loading = true;
       state.error = null;
     },
@@ -23,7 +26,7 @@ const applicationSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    requestForMyApplications(state, action) {
+    requestForMyApplications(state) {
       state.loading = true;
       state.error = null;
     },
@@ -36,7 +39,7 @@ const applicationSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    requestForPostApplication(state, action) {
+    requestForPostApplication(state) {
       state.loading = true;
       state.error = null;
       state.message = null;
@@ -51,7 +54,7 @@ const applicationSlice = createSlice({
       state.error = action.payload;
       state.message = null;
     },
-    requestForDeleteApplication(state, action) {
+    requestForDeleteApplication(state) {
       state.loading = true;
       state.error = null;
       state.message = null;
@@ -66,14 +69,12 @@ const applicationSlice = createSlice({
       state.error = action.payload;
       state.message = null;
     },
-
-    clearAllErrors(state, action) {
+    clearAllErrors(state) {
       state.error = null;
-      state.applications = state.applications;
     },
-    resetApplicationSlice(state, action) {
+    resetApplicationSlice(state) {
       state.error = null;
-      state.applications = state.applications;
+      state.applications = [];
       state.message = null;
       state.loading = false;
     },
@@ -84,10 +85,8 @@ export const fetchEmployerApplications = () => async (dispatch) => {
   dispatch(applicationSlice.actions.requestForAllApplications());
   try {
     const response = await axios.get(
-      `https://fullstack-job-portal-jobsindia-backend.onrender.com/api/v1/application/employer/getall`,
-      {
-        withCredentials: true,
-      }
+      `${API_BASE_URL}/api/v1/application/employer/getall`, // Use the environment variable
+      { withCredentials: true }
     );
     dispatch(
       applicationSlice.actions.successForAllApplications(
@@ -108,10 +107,8 @@ export const fetchJobSeekerApplications = () => async (dispatch) => {
   dispatch(applicationSlice.actions.requestForMyApplications());
   try {
     const response = await axios.get(
-      `https://fullstack-job-portal-jobsindia-backend.onrender.com/api/v1/application/jobseeker/getall`,
-      {
-        withCredentials: true,
-      }
+      `${API_BASE_URL}/api/v1/application/jobseeker/getall`, // Use the environment variable
+      { withCredentials: true }
     );
     dispatch(
       applicationSlice.actions.successForMyApplications(
@@ -132,7 +129,7 @@ export const postApplication = (data, jobId) => async (dispatch) => {
   dispatch(applicationSlice.actions.requestForPostApplication());
   try {
     const response = await axios.post(
-      `https://fullstack-job-portal-jobsindia-backend.onrender.com/api/v1/application/post/${jobId}`,
+      `${API_BASE_URL}/api/v1/application/post/${jobId}`, // Use the environment variable
       data,
       {
         withCredentials: true,
@@ -156,7 +153,7 @@ export const deleteApplication = (id) => async (dispatch) => {
   dispatch(applicationSlice.actions.requestForDeleteApplication());
   try {
     const response = await axios.delete(
-      `https://fullstack-job-portal-jobsindia-backend.onrender.com/api/v1/application/delete/${id}`,
+      `${API_BASE_URL}/api/v1/application/delete/${id}`, // Use the environment variable
       { withCredentials: true }
     );
     dispatch(

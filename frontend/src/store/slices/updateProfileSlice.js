@@ -47,7 +47,7 @@ export const updateProfile = (data) => async (dispatch) => {
   dispatch(updateProfileSlice.actions.updateProfileRequest());
   try {
     const response = await axios.put(
-      "https://fullstack-job-portal-jobsindia-backend.onrender.com/api/v1/user/update/profile",
+      `${import.meta.env.VITE_BACKEND}/api/v1/user/update/profile`,
       data,
       {
         withCredentials: true,
@@ -58,16 +58,17 @@ export const updateProfile = (data) => async (dispatch) => {
   } catch (error) {
     dispatch(
       updateProfileSlice.actions.updateProfileFailed(
-        error.response.data.message || "Failed to update profile."
+        error.response?.data?.message || "Failed to update profile."
       )
     );
   }
 };
+
 export const updatePassword = (data) => async (dispatch) => {
   dispatch(updateProfileSlice.actions.updatePasswordRequest());
   try {
     const response = await axios.put(
-      "https://fullstack-job-portal-jobsindia-backend.onrender.com/api/v1/user/update/password",
+      `${import.meta.env.VITE_BACKEND}/api/v1/user/update/password`,
       data,
       {
         withCredentials: true,
@@ -78,7 +79,7 @@ export const updatePassword = (data) => async (dispatch) => {
   } catch (error) {
     dispatch(
       updateProfileSlice.actions.updatePasswordFailed(
-        error.response.data.message || "Failed to update password."
+        error.response?.data?.message || "Failed to update password."
       )
     );
   }
