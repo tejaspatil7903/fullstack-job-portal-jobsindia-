@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+
 const API_BASE_URL = import.meta.env.VITE_BACKEND;
 
 const userSlice = createSlice({
@@ -12,7 +13,7 @@ const userSlice = createSlice({
     message: null,
   },
   reducers: {
-    registerRequest(state, action) {
+    registerRequest(state) {
       state.loading = true;
       state.isAuthenticated = false;
       state.user = {};
@@ -33,7 +34,7 @@ const userSlice = createSlice({
       state.error = action.payload;
       state.message = null;
     },
-    loginRequest(state, action) {
+    loginRequest(state) {
       state.loading = true;
       state.isAuthenticated = false;
       state.user = {};
@@ -54,7 +55,7 @@ const userSlice = createSlice({
       state.error = action.payload;
       state.message = null;
     },
-    fetchUserRequest(state, action) {
+    fetchUserRequest(state) {
       state.loading = true;
       state.isAuthenticated = false;
       state.user = {};
@@ -72,28 +73,26 @@ const userSlice = createSlice({
       state.user = {};
       state.error = action.payload;
     },
-    logoutSuccess(state, action) {
+    logoutSuccess(state) {
       state.isAuthenticated = false;
       state.user = {};
       state.error = null;
     },
     logoutFailed(state, action) {
-      state.isAuthenticated = state.isAuthenticated;
-      state.user = state.user;
       state.error = action.payload;
     },
-    clearAllErrors(state, action) {
+    clearAllErrors(state) {
       state.error = null;
-      state.user = state.user;
     },
   },
 });
 
+// Async actions
 export const register = (data) => async (dispatch) => {
   dispatch(userSlice.actions.registerRequest());
   try {
     const response = await axios.post(
-      "${API_BASE_URL}/api/v1/user/register",
+      `${API_BASE_URL}/api/v1/user/register`,
       data,
       {
         withCredentials: true,
@@ -111,7 +110,7 @@ export const login = (data) => async (dispatch) => {
   dispatch(userSlice.actions.loginRequest());
   try {
     const response = await axios.post(
-      "${API_BASE_URL}/api/v1/user/login",
+      `${API_BASE_URL}/api/v1/user/login`,
       data,
       {
         withCredentials: true,
@@ -128,7 +127,7 @@ export const login = (data) => async (dispatch) => {
 export const getUser = () => async (dispatch) => {
   dispatch(userSlice.actions.fetchUserRequest());
   try {
-    const response = await axios.get("${API_BASE_URL}/api/v1/user/getuser", {
+    const response = await axios.get(`${API_BASE_URL}/api/v1/user/getuser`, {
       withCredentials: true,
     });
     dispatch(userSlice.actions.fetchUserSuccess(response.data.user));
@@ -137,9 +136,10 @@ export const getUser = () => async (dispatch) => {
     dispatch(userSlice.actions.fetchUserFailed(error.response.data.message));
   }
 };
+
 export const logout = () => async (dispatch) => {
   try {
-    const response = await axios.get("${API_BASE_URL}/api/v1/user/logout", {
+    const response = await axios.get(`${API_BASE_URL}/api/v1/user/logout`, {
       withCredentials: true,
     });
     dispatch(userSlice.actions.logoutSuccess());
@@ -149,8 +149,26 @@ export const logout = () => async (dispatch) => {
   }
 };
 
+// Clear errors action
 export const clearAllUserErrors = () => (dispatch) => {
   dispatch(userSlice.actions.clearAllErrors());
 };
 
+// Export actions for usage in components
+export const {
+  registerRequest,
+  registerSuccess,
+  registerFailed,
+  loginRequest,
+  loginSuccess,
+  loginFailed,
+  fetchUserRequest,
+  fetchUserSuccess,
+  fetchUserFailed,
+  logoutSuccess,
+  logoutFailed,
+  clearAllErrors,
+} = userSlice.actions;
+
+// Export the reducer
 export default userSlice.reducer;
