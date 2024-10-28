@@ -2,184 +2,155 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 const API_BASE_URL = import.meta.env.VITE_BACKEND;
 
-const applicationSlice = createSlice({
-  name: "applications",
+const userSlice = createSlice({
+  name: "user",
   initialState: {
-    applications: [],
     loading: false,
+    isAuthenticated: false,
+    user: {},
     error: null,
     message: null,
   },
   reducers: {
-    requestForAllApplications(state, action) {
+    registerRequest(state, action) {
       state.loading = true;
-      state.error = null;
-    },
-    successForAllApplications(state, action) {
-      state.loading = false;
-      state.error = null;
-      state.applications = action.payload;
-    },
-    failureForAllApplications(state, action) {
-      state.loading = false;
-      state.error = action.payload;
-    },
-    requestForMyApplications(state, action) {
-      state.loading = true;
-      state.error = null;
-    },
-    successForMyApplications(state, action) {
-      state.loading = false;
-      state.error = null;
-      state.applications = action.payload;
-    },
-    failureForMyApplications(state, action) {
-      state.loading = false;
-      state.error = action.payload;
-    },
-    requestForPostApplication(state, action) {
-      state.loading = true;
+      state.isAuthenticated = false;
+      state.user = {};
       state.error = null;
       state.message = null;
     },
-    successForPostApplication(state, action) {
+    registerSuccess(state, action) {
       state.loading = false;
+      state.isAuthenticated = true;
+      state.user = action.payload.user;
       state.error = null;
-      state.message = action.payload;
+      state.message = action.payload.message;
     },
-    failureForPostApplication(state, action) {
+    registerFailed(state, action) {
       state.loading = false;
+      state.isAuthenticated = false;
+      state.user = {};
       state.error = action.payload;
       state.message = null;
     },
-    requestForDeleteApplication(state, action) {
+    loginRequest(state, action) {
       state.loading = true;
+      state.isAuthenticated = false;
+      state.user = {};
       state.error = null;
       state.message = null;
     },
-    successForDeleteApplication(state, action) {
+    loginSuccess(state, action) {
       state.loading = false;
+      state.isAuthenticated = true;
+      state.user = action.payload.user;
       state.error = null;
-      state.message = action.payload;
+      state.message = action.payload.message;
     },
-    failureForDeleteApplication(state, action) {
+    loginFailed(state, action) {
       state.loading = false;
+      state.isAuthenticated = false;
+      state.user = {};
       state.error = action.payload;
       state.message = null;
+    },
+    fetchUserRequest(state, action) {
+      state.loading = true;
+      state.isAuthenticated = false;
+      state.user = {};
+      state.error = null;
+    },
+    fetchUserSuccess(state, action) {
+      state.loading = false;
+      state.isAuthenticated = true;
+      state.user = action.payload;
+      state.error = null;
+    },
+    fetchUserFailed(state, action) {
+      state.loading = false;
+      state.isAuthenticated = false;
+      state.user = {};
+      state.error = action.payload;
+    },
+    logoutSuccess(state, action) {
+      state.isAuthenticated = false;
+      state.user = {};
+      state.error = null;
+    },
+    logoutFailed(state, action) {
+      state.isAuthenticated = state.isAuthenticated;
+      state.user = state.user;
+      state.error = action.payload;
     },
     clearAllErrors(state, action) {
       state.error = null;
-      state.applications = state.applications;
-    },
-    resetApplicationSlice(state, action) {
-      state.error = null;
-      state.applications = state.applications;
-      state.message = null;
-      state.loading = false;
+      state.user = state.user;
     },
   },
 });
 
-export const fetchEmployerApplications = () => async (dispatch) => {
-  dispatch(applicationSlice.actions.requestForAllApplications());
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/v1/application/employer/getall`,
-      {
-        withCredentials: true,
-      }
-    );
-    dispatch(
-      applicationSlice.actions.successForAllApplications(
-        response.data.applications
-      )
-    );
-    dispatch(applicationSlice.actions.clearAllErrors());
-  } catch (error) {
-    dispatch(
-      applicationSlice.actions.failureForAllApplications(
-        error.response.data.message
-      )
-    );
-  }
-};
-
-export const fetchJobSeekerApplications = () => async (dispatch) => {
-  dispatch(applicationSlice.actions.requestForMyApplications());
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/v1/application/jobseeker/getall`,
-      {
-        withCredentials: true,
-      }
-    );
-    dispatch(
-      applicationSlice.actions.successForMyApplications(
-        response.data.applications
-      )
-    );
-    dispatch(applicationSlice.actions.clearAllErrors());
-  } catch (error) {
-    dispatch(
-      applicationSlice.actions.failureForMyApplications(
-        error.response.data.message
-      )
-    );
-  }
-};
-
-export const postApplication = (data, jobId) => async (dispatch) => {
-  dispatch(applicationSlice.actions.requestForPostApplication());
+export const register = (data) => async (dispatch) => {
+  dispatch(userSlice.actions.registerRequest());
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/api/v1/application/post/${jobId}`,
+      "${API_BASE_URL}/api/v1/user/register",
       data,
       {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       }
     );
-    dispatch(
-      applicationSlice.actions.successForPostApplication(response.data.message)
-    );
-    dispatch(applicationSlice.actions.clearAllErrors());
+    dispatch(userSlice.actions.registerSuccess(response.data));
+    dispatch(userSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(
-      applicationSlice.actions.failureForPostApplication(
-        error.response.data.message
-      )
-    );
+    dispatch(userSlice.actions.registerFailed(error.response.data.message));
   }
 };
 
-export const deleteApplication = (id) => async (dispatch) => {
-  dispatch(applicationSlice.actions.requestForDeleteApplication());
+export const login = (data) => async (dispatch) => {
+  dispatch(userSlice.actions.loginRequest());
   try {
-    const response = await axios.delete(
-      `${API_BASE_URL}/api/v1/application/delete/${id}`,
-      { withCredentials: true }
+    const response = await axios.post(
+      "${API_BASE_URL}/api/v1/user/login",
+      data,
+      {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" },
+      }
     );
-    dispatch(
-      applicationSlice.actions.successForDeleteApplication(
-        response.data.message
-      )
-    );
-    dispatch(clearAllApplicationErrors());
+    dispatch(userSlice.actions.loginSuccess(response.data));
+    dispatch(userSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(
-      applicationSlice.actions.failureForDeleteApplication(
-        error.response.data.message
-      )
-    );
+    dispatch(userSlice.actions.loginFailed(error.response.data.message));
   }
 };
 
-export const clearAllApplicationErrors = () => (dispatch) => {
-  dispatch(applicationSlice.actions.clearAllErrors());
+export const getUser = () => async (dispatch) => {
+  dispatch(userSlice.actions.fetchUserRequest());
+  try {
+    const response = await axios.get("${API_BASE_URL}/api/v1/user/getuser", {
+      withCredentials: true,
+    });
+    dispatch(userSlice.actions.fetchUserSuccess(response.data.user));
+    dispatch(userSlice.actions.clearAllErrors());
+  } catch (error) {
+    dispatch(userSlice.actions.fetchUserFailed(error.response.data.message));
+  }
+};
+export const logout = () => async (dispatch) => {
+  try {
+    const response = await axios.get("${API_BASE_URL}/api/v1/user/logout", {
+      withCredentials: true,
+    });
+    dispatch(userSlice.actions.logoutSuccess());
+    dispatch(userSlice.actions.clearAllErrors());
+  } catch (error) {
+    dispatch(userSlice.actions.logoutFailed(error.response.data.message));
+  }
 };
 
-export const resetApplicationSlice = () => (dispatch) => {
-  dispatch(applicationSlice.actions.resetApplicationSlice());
+export const clearAllUserErrors = () => (dispatch) => {
+  dispatch(userSlice.actions.clearAllErrors());
 };
 
-export default applicationSlice.reducer;
+export default userSlice.reducer;
