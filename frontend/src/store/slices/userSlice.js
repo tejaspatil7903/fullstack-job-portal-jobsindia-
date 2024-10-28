@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+const API_BASE_URL = import.meta.env.VITE_BACKEND;
 
 const applicationSlice = createSlice({
   name: "applications",
@@ -83,7 +84,7 @@ export const fetchEmployerApplications = () => async (dispatch) => {
   dispatch(applicationSlice.actions.requestForAllApplications());
   try {
     const response = await axios.get(
-      `${process.env.BACKEND}/api/v1/application/employer/getall`,
+      `${API_BASE_URL}/api/v1/application/employer/getall`,
       {
         withCredentials: true,
       }
@@ -107,7 +108,7 @@ export const fetchJobSeekerApplications = () => async (dispatch) => {
   dispatch(applicationSlice.actions.requestForMyApplications());
   try {
     const response = await axios.get(
-      `${process.env.BACKEND}/api/v1/application/jobseeker/getall`,
+      `${API_BASE_URL}/api/v1/application/jobseeker/getall`,
       {
         withCredentials: true,
       }
@@ -131,7 +132,7 @@ export const postApplication = (data, jobId) => async (dispatch) => {
   dispatch(applicationSlice.actions.requestForPostApplication());
   try {
     const response = await axios.post(
-      `${process.env.BACKEND}/api/v1/application/post/${jobId}`,
+      `${API_BASE_URL}/api/v1/application/post/${jobId}`,
       data,
       {
         withCredentials: true,
@@ -155,7 +156,7 @@ export const deleteApplication = (id) => async (dispatch) => {
   dispatch(applicationSlice.actions.requestForDeleteApplication());
   try {
     const response = await axios.delete(
-      `${process.env.BACKEND}/api/v1/application/delete/${id}`,
+      `${API_BASE_URL}/api/v1/application/delete/${id}`,
       { withCredentials: true }
     );
     dispatch(
